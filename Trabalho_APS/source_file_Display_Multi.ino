@@ -1,7 +1,7 @@
 
 
 //=== Mapeamento de Hardware ========================================================
-//(1<<x) representa o bit x que se quer setar, ou verificar.
+//(1<<x) representa o bit x que se quer  referir podendo setar, ou verificar.
 
 #define col1 (1<<0)             //Endereço do bit coluna 1
 #define col2 (1<<1)             //Endereço do bit coluna 2
@@ -16,9 +16,14 @@
 
 //=== Variaveis Globais =============================================================     
 int uni,dez,cen,mil,cont = 0;   //Utilizadas para o controle do Valor mostrado.
-boolean Flag_botao = 0x00;       //Flags de validação de aperto de botões.
+boolean Flag_botao = 0x00;      //Flags de validação de aperto de botões.
 int aux = 40;                   //Tempo de delay da multiplexação dos Displays.
-int aux2 =0;                    //Auxiliar de contagem.
+int aux2 = 0;                   //Auxiliar de contagem.
+
+int n_teclado[4][4] = {1,2,3,10
+                      4,5,6,11
+                      7,8,9,12
+                      14,15,13};
 
 //=== Funções Auxiliares ===
 void Multiplexacao();
@@ -60,10 +65,8 @@ void Multiplexacao(){
 }
 //================================================================================
 void Counter (){
-  aux2++;
-  if(aux2>=10){
-    cont+=45;
-    aux2=0; 
+  if(){
+     
   }
   mil = cont/1000;                  //Coloca o valor da casa do milhar em mil.
   cen = (cont%1000)/100;            //Coloca o valor da casa da centena em cen.
@@ -72,21 +75,26 @@ void Counter (){
   
 }
 
-//Função que Valida aperto de Botoes.
-void DeBoucing_de_botoes(){
-  DDRD = 0xF0;            //Os bits 0 à 3 entradas, os bits 4 à 7 saida.
-  PORTD = '0b10010000';   //Coloca na primeira Linha do teclado.
+//=== Função Varrer o Teclado ===
+void LeTeclado(){
+    DDRD = 0xF0;                      //Os bits 0 à 3 entradas, os bits 4 à 7 saida.
+  PORTD = '0b10010000';             //Coloca na primeira Linha do teclado.
+  do{
+      do{
+          if(PIND&(col1|col2|col3|col4_Fx)) Flag_botao = 0x01;      //Testa o aperto do botao.
+          if(!(PIND&col1)&& Flag_botao) {
+                Flag_botao = 0x00;
 
-  if(PIND&col1) col1_f = 0x01;  //Testa o aperto do botao e coloca a flag da coluna 1 em True.
-  if((!PIND&col1) && col1_f){
-    col1_f = 0x00;
-    cont++; 
+            }
+      }
   }
-  if(PIND&col2) col2_f = 0x01;  //Testa o aperto do botao e coloca a flag da coluna 2 em True.
-  if((!PIND&col2) && col2_f){
-    col2_f = 0x00;
-    cont--; 
-  }
-  
-  return;
+
 }
+
+
+
+
+
+
+
+
