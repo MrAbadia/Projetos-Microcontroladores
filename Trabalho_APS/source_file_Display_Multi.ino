@@ -15,19 +15,28 @@
 #define LE  (1<<4)              //PORTD4 em '0' habilita o 4511 permitindo a alteraçao dos displays, em '1' trava as entradas do mesmo, segue a mesma logica do PORTD7
 
 //=== Variaveis Globais =============================================================     
-int uni,dez,cen,mil,cont = 0;   //Utilizadas para o controle do Valor mostrado.
-boolean Flag_botao = 0x00;      //Flags de validação de aperto de botões.
+int uni,dez,cen,mil,numero = 0;        //Utilizadas para o controle do Valor mostrado.
+int contador_N,contador_P = 0;
+int nor_pre = 1;
+
+boolean Flag_botao1 = 0x00;      //Flags de validação de aperto de botões, para as respectivas colunas.
+boolean Flag_botao2 = 0x00;
+boolean Flag_botao3 = 0x00;
+boolean Flag_botao4 = 0x00;
+boolean Flag_Stop = 0x00;
+
 int aux = 40;                   //Tempo de delay da multiplexação dos Displays.
 int aux2 = 0;                   //Auxiliar de contagem.
 
-int n_teclado[4][4] = {1,2,3,10
-                      4,5,6,11
-                      7,8,9,12
-                      14,15,13};
+int indice[4][4] ={ 1,2,3,10,   //contem o respectivo valor da tecla.
+                    4,5,6,11,
+                    7,8,9,12,
+                    14,0,15,13};
 
-//=== Funções Auxiliares ===
+//=== Funções Auxiliares ===    Declaração de Funções.
 void Multiplexacao();
-void Counter();
+void LeTeclado();
+void Numero_Display(int numero);
 
 //=== INICIO ======================================================================= 
 void setup() {
@@ -64,30 +73,59 @@ void Multiplexacao(){
   delay(aux);                   //Espera um valor de tempo em milisegundos.
 }
 //================================================================================
-void Counter (){
-  if(){
-     
-  }
-  mil = cont/1000;                  //Coloca o valor da casa do milhar em mil.
-  cen = (cont%1000)/100;            //Coloca o valor da casa da centena em cen.
-  dez = ((cont%1000)%100)/10;       //Coloca o valor da casa da dezena em dez.
-  uni = ((cont%1000)%100)%10;       //Coloca o valor da casa da unidade em uni.
+void Numero_Display (int numero){
+    contador_N += numero*nor_pre;      //Salva o contador normal.
+    contador_P += numero*!(nor_pre);   //Salva o contador preferêncial.
+
+  numero = (contador_N*nor_pre) + (contador_P*!(nor_pre); //nor_pre : em 1 mostra o normal, em 0 preferêncial.
+
+  mil = numero/1000;                  //Coloca o valor da casa do milhar em mil.
+  cen = (numero%1000)/100;            //Coloca o valor da casa da centena em cen.
+  dez = ((numero%1000)%100)/10;       //Coloca o valor da casa da dezena em dez.
+  uni = ((numero%1000)%100)%10;       //Coloca o valor da casa da unidade em uni.
   
 }
 
 //=== Função Varrer o Teclado ===
 void LeTeclado(){
+    int N_linha = 0;
     DDRD = 0xF0;                      //Os bits 0 à 3 entradas, os bits 4 à 7 saida.
-  PORTD = '0b10010000';             //Coloca na primeira Linha do teclado.
-  do{
-      do{
-          if(PIND&(col1|col2|col3|col4_Fx)) Flag_botao = 0x01;      //Testa o aperto do botao.
-          if(!(PIND&col1)&& Flag_botao) {
-                Flag_botao = 0x00;
+    PORTD = '0b10010000';             //Coloca na primeira Linha do teclado.
+    do{
+        do{
+            N_linha++;
+            if(PIND&col1){
+                Flag_botao1 = 0x01;}      //Testa o aperto do botao.
+            if(!(PIND&col1)&& Flag_botao1) {
+                Flag_botao1 = 0x00;
 
             }
-      }
-  }
+
+            if(PIND&col2){
+               Flag_botao2 = 0x01;}      //Testa o aperto do botao.
+          if(!(PIND&col2)&& Flag_botao2) {
+                Flag_botao2 = 0x00;
+
+            }
+
+            if(PIND&col3){
+               Flag_botao3 = 0x01;}      //Testa o aperto do botao.
+          if(!(PIND&col3)&& Flag_botao3) {
+                Flag_botao3 = 0x00;
+
+            }
+
+            if(PIND&col4_Fx){
+               Flag_botao4 = 0x01;}      //Testa o aperto do botao.
+          if(!(PIND&col4_Fx)&& Flag_botao4) {
+                Flag_botao4 = 0x00;
+                if(N_linha == 1) 
+
+            }
+
+
+        }
+    }
 
 }
 
