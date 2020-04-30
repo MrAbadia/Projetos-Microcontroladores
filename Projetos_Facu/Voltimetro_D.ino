@@ -3,21 +3,18 @@
 //=== Mapeamento de Hardware ========================================================
 //(1<<x) representa o bit x que se quer setar, ou verificar.
 
-#define col1 (1<<0)             //Endereço do bit coluna 1
-#define col2 (1<<1)             //Endereço do bit coluna 2
-#define col3 (1<<2)             //Endereço do bit coluna 3
-#define col4_Fx (1<<3)          //Endereço do bit coluna 4
+#define col1 (1<<0)             //Endereço do bit 0, A no 4511
+#define col2 (1<<1)             //Endereço do bit 1, B no 4511 
+#define col3 (1<<2)             //Endereço do bit 2, C no 4511
+#define col4_Fx (1<<3)          //Endereço do bit 3, D no 4511
 
+#define LE  (1<<4)              //PORTD4 em '0' habilita o 4511 permitindo a alteraçao dos displays, em '1' trava as entradas do mesmo.
 
-#define PD7_C_TEC  (1<<7)       //PORTD7, em 0 seleciona os Display, em 1 seleciona o Teclado  
-#define PD6_DIS_COL_A  (1<<6)   //PORTD6,5 respectivamente A,B Variam juntos de 00,01,10,11 e Varrem os Displays e o Teclado
-#define PD5_DIS_COL_B  (1<<5)
-#define LE  (1<<4)              //PORTD4 em '0' habilita o 4511 permitindo a alteraçao dos displays, em '1' trava as entradas do mesmo, segue a mesma logica do PORTD7
-
-//=== Variaveis Globais =============================================================     
+//=== Variaveis Globais =============================================================
+unsigned int VOLT;     
 int uni,dez,cen,mil,cont = 0;   //Utilizadas para o controle do Valor mostrado.
 
-int aux = 40;                   //Tempo de delay da multiplexação dos Displays.
+int aux = 10;                   //Tempo de delay da multiplexação dos Displays.
 int aux2 =0;                    //Auxiliar de contagem.
 
 
@@ -28,7 +25,9 @@ void Counter();
 //=== INICIO ======================================================================= 
 void setup() {
   DDRD = 0xFF;                  //PORTD é Saida digital.
-  
+  DDRC &= ~(1<<0);              //PORTC0 é analogico
+
+   
   
 }
 //=== Loop Infinito ===============================================================
