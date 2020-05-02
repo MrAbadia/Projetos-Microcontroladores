@@ -1,39 +1,58 @@
 
 
 //=== Mapeamento de Hardware ========================================================
-//(1<<x) representa o bit x que se quer setar, ou verificar.
-
-#define col1 (1<<0)             //Endereço do bit 0, A no 4511
-#define col2 (1<<1)             //Endereço do bit 1, B no 4511 
-#define col3 (1<<2)             //Endereço do bit 2, C no 4511
-#define col4_Fx (1<<3)          //Endereço do bit 3, D no 4511
-
-#define LE  (1<<4)              //PORTD4 em '0' habilita o 4511 permitindo a alteraçao dos displays, em '1' trava as entradas do mesmo.
 
 //=== Variaveis Globais =============================================================
-unsigned int VOLT;     
+unsigned int VOLT = 0; 
+int tensao = 0;
+
+
+
 int uni,dez,cen,mil,cont = 0;   //Utilizadas para o controle do Valor mostrado.
 
-int aux = 10;                   //Tempo de delay da multiplexação dos Displays.
-int aux2 =0;                    //Auxiliar de contagem.
+int aux = 45;                   //Tempo de delay da multiplexação dos Displays.
+                    
 
 
 //=== Funções Auxiliares ===
 void Multiplexacao();
-void Counter();
+void Valor_Displays();
+unsigned int medicao(char aux2);
 
 //=== INICIO ======================================================================= 
 void setup() {
-  DDRD = 0xFF;                  //PORTD é Saida digital.
-  DDRC &= ~(1<<0);              //PORTC0 é analogico
+  DDRD = 0xff;          //PORTD SAIDA;
+  DDRC &= ~(1<<0);      //         PORTC0 é entrada.
+  DIDR0 |= (1<<0);              //Desabilita entra digital.
+  ADCSRA =0b10000111;         //  bit 7 ADEN ->liga ADC
+                              //  bit 6 ADCS inicia a conversao.
+                              //  bit 5 ADATE disparo automatico de conversao.
+// prescaler de 128 x (1/16Mhz)   bit 4 ADIF indicador de interrupçao
+//= 125KHz.                       bit 3 ADIE Habilita Interrupçao
+                              //  bits 2-0 Seleciona a divisao.
+                              //  000 - 2
+                              //  001 - 2
+                              //  010 - 4
+                              //  011 - 8
+                              //  100 - 16
+                              //  101 - 32
+                              //  110 - 64
+                              //  111 - 128 
 
-   
-  
+  ADMUX = 0x00;           //Referencia de tensao, AREF.
+//ADMUX = 0b00.0.0.0000 de bit 0 a 3 seleciona a entrada.
+
+/*ADCSRB =0b00000000;         
+ *bit 6 Habilitar comparadores
+  bit 2-0 Seleciona a fonte de disparo automatico*/  
 }
 //=== Loop Infinito ===============================================================
 void loop() {                   
   Multiplexacao();              //Chama a Função, que coloca os respectivos numero nos displays e efetua a MULTIPLEXAÇÃO.
-  Counter();                    //Chama a Função, efetua a contagem de numeros e os coloca nos respectivas variaveis.
+  VOLT = medicao(0);
+  tensao = VOLT*25/1023;
+  Valor_Displays();
+  
 }
 //=== Funções Auxiliares ==========================================================
 void Multiplexacao(){
@@ -61,7 +80,7 @@ void Multiplexacao(){
 //================================================================================
 //Coloca os valores no respectivo display.
 void Valor_Displays (){
-  
+  cont = tensao;
   
   mil = cont/1000;                  //Coloca o valor da casa do milhar em mil.
   cen = (cont%1000)/100;            //Coloca o valor da casa da centena em cen.
@@ -69,8 +88,20 @@ void Valor_Displays (){
   uni = ((cont%1000)%100)%10;       //Coloca o valor da casa da unidade em uni.
   
 }
+//=== Faz a medição da porta C respectiva ===
+unsigned int medicao(char aux2){
+  unsigned int aux_volt = 0;
+  ADMUX |= 0x0F & aux2;             //mascara permite a mudança dos valores dos bits 3 ao 0, somente.
+  ADCSRA |= (1<<6);                 //Em 1 da start na conversao em 0 encerra.
+  while (ADCSRA&(1<<6));            //Espera o encerramento da conversao.
+    
+                                    //ADLAR = 0 ;
+                                    // ADCH Nos bits 1 e 0 possuem os valors do bit 9 e 8.
+                                    // ADCL possue dos valores dos bits 7 ao 0.
+  aux_volt |= ADCH;                 // Posiciona corretamente os 10 bits no repectivo lugar.
+  aux_volt = (aux_volt << 8);
+  aux_volt |= ADCL;
 
-
-void Le_Porta_volt(){
-  
+    
+return aux_volt;                    //retorna com o valor.  
 }
