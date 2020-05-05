@@ -6,13 +6,8 @@
 unsigned int VOLT = 0; 
 int tensao = 0;
 
-
-
 int uni,dez,cen,mil,cont = 0;   //Utilizadas para o controle do Valor mostrado.
-
 int aux = 45;                   //Tempo de delay da multiplexação dos Displays.
-                    
-
 
 //=== Funções Auxiliares ===
 void Multiplexacao();

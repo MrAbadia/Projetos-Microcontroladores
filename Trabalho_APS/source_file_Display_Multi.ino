@@ -50,7 +50,7 @@ void setup() {
 
   // A interrupção ocorre a cada 1ms.
   // O tempo da interrupção leva em consideração de um clock de 16MHz.
-  
+
   sei();                //Habillita a interrupção global
 }
 //=== Loop Infinito ===============================================================
@@ -84,11 +84,12 @@ void Multiplexacao(){
 }
 //================================================================================
 void Numero_Display (){
+  int numero;
   if(Flag_Start){
-    int numero = display * 10 + valor;
+     numero = display * 10 + valor;
         
   } else {
-    int numero = (contador_N*nor_pre) + (contador_P*(1-nor_pre)); //nor_pre : em 1 mostra o normal, em 0 preferêncial.
+     numero = (contador_N*nor_pre) + (contador_P*(1-nor_pre)); //nor_pre : em 1 mostra o normal, em 0 preferêncial.
   }
   if(contador_N == 9000) contador_N = 0;
   if(contador_N == -1) contador_N = 8999;
@@ -166,11 +167,11 @@ void LeTeclado(){
               if(PIND&col2){
                 Flag_botao2 = 0x01;      //Testa o aperto do botao.
                 linha = N_linha;//Salva o numero da linha
-                flag_loop = 0;                //Torna o while falso.
+                flag_aperto_de_botao = 0;                //Torna o while falso.
               }  
               if(!(PIND&col2)&& Flag_botao2) {
                 Flag_botao2 = 0x00;           //zera a flag do mesmo
-                flag_loop = 0;                //Torna o while falso.
+                flag_aperto_de_botao = 0;                //Torna o while falso.
                 if(linha == 1){//Testa o numero da linha
                   valor = 2;
                 }
@@ -188,11 +189,11 @@ void LeTeclado(){
               if(PIND&col3){//Testa o aperto do botão.
                 Flag_botao3 = 0x01;//Seta a flag do Botão   
                 linha = N_linha;//Salva o numero da linha
-                flag_loop = 0;                //Torna o while falso.
+                flag_aperto_de_botao = 0;            //Torna o while falso.
               }
               if(!(PIND&col3)&& Flag_botao3) {
                 Flag_botao3 = 0x00;//zera a flag do botão
-                flag_loop = 0;                //Torna o while falso.
+                flag_aperto_de_botao = 0;            //Torna o while falso.
                 if(linha == 1){//Testa o numero da linha
                   valor = 3;
                 }
@@ -214,10 +215,10 @@ void LeTeclado(){
               }
             }
             PORTD ^= B_DIS_COL;// Muda o PORTD5 inverte o seu valor
-          }while(PIND&B_DIS_COL&&flag_loop);//end do-while,Testa se o PD5 é 1
+          }while(PIND&B_DIS_COL&&flag_aperto_de_botao);//end do-while,Testa se o PD5 é 1
 
         PORTD ^= A_DIS_COL;// Muda o PORTD6 inverte o seu valor
-      }while(PIND&A_DIS_COL&&flag_loop);//end do-while,Testa se o PD6 é 1
+      }while(PIND&A_DIS_COL&&flag_aperto_de_botao);//end do-while,Testa se o PD6 é 1
     
   return;
 }
