@@ -34,7 +34,7 @@ boolean Flag_Start = 0x00;
 boolean flag_aperto_de_botao = 1;//Possibilita a saida do laço após aperto de tecla, Identifica o aperto de um Botão.
 
 int aux = 40;                   //Tempo de delay da multiplexação dos Displays.
-int aux2 = 0;                   //Auxiliar de contagem.
+int aux2 = 0;                   //Auxiliar de contagem na Interrupção.
 
 //=== Funções Auxiliares ===    Declaração de Funções.
 void Multiplexacao();
@@ -43,17 +43,19 @@ void Numero_Display();
 
 //=== INICIO ======================================================================= 
 void setup() {
-  TCNT2 = 0;          //Inicia a contagem do  timer2 em 0;
-  TCCR2A = 0x00;
-  TCCR2B = 0x07;        //Configura o prescaler 1:1024
+  TCNT2 = 193 ;         //Inicia a contagem do  timer2 em (256 - 193) = 63;
+  TCCR2A = 0x00;        //Configura num estado normal.
+  TCCR2B = 0x06;        //Configura o prescaler 1:256
   TIMSK2 = 0x01;        //Habilita a interrupçao por estouro do timer2.
+
+  // A interrupção ocorre a cada 1ms.
+  // O tempo da interrupção leva em consideração de um clock de 16MHz.
   
   sei();                //Habillita a interrupção global
 }
 //=== Loop Infinito ===============================================================
 void loop() {                   
   Multiplexacao();              //Chama a Função, que coloca os respectivos numero nos displays e efetua a MULTIPLEXAÇÃO.
-  Numero_Display();                    //Chama a Função, efetua a contagem de numeros e os coloca nos respectivas variaveis.
 }
 //=== Funções Auxiliares ==========================================================
 void Multiplexacao(){
@@ -220,11 +222,11 @@ void LeTeclado(){
   return;
 }
 ISR(TIMER2_OVF_vect){
-  
-  cont++;
-  if(cont == x){
-    cont = 0;           // zera o contador
-    TCNT2 = 105;        //Reinicia em 105, o valor de tcnt2 para contar mais 150 vezes.
+  aux2++;
+  if(aux2 == 10){
+    aux2 = 0;           // zera o contador
+    TCNT2 = 193;        //Reinicia em 193, o valor de tcnt2 para contar mais 150 vezes.
+    LeTeclado();
   }
   return;
 }
